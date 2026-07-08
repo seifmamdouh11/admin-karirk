@@ -16,6 +16,39 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
+  // Search & Filtering States
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+
+  const uniqueCategories = Array.from(
+    new Set([
+      ...jobs.map((j) => j.category),
+      ...posts.map((p) => p.category),
+    ].filter(Boolean))
+  );
+
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch = 
+      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (job.company || "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = 
+      selectedCategory === "all" || job.category === selectedCategory;
+    const matchesStatus = 
+      selectedStatus === "all" || job.status === selectedStatus;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch = 
+      post.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = 
+      selectedCategory === "all" || post.category === selectedCategory;
+    const matchesStatus = 
+      selectedStatus === "all" || post.status === selectedStatus;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
   const handleDelete = async (id: string, type: "jobs" | "posts") => {
     if (!secret) {
       setError("Please enter your Admin Secret Key first.");
@@ -216,7 +249,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
         {/* Tab Controls */}
         <div className="flex bg-zinc-100/60 p-1.5 rounded-2xl self-start inline-flex border border-zinc-200/50">
           <button
-            onClick={() => setActiveTab("jobs")}
+            onClick={() => { setActiveTab("jobs"); setSelectedStatus("all"); }}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
               activeTab === "jobs" 
                 ? "bg-white text-indigo-600 shadow-md shadow-zinc-250/20" 
@@ -227,7 +260,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
             Jobs ({jobs.length})
           </button>
           <button
-            onClick={() => setActiveTab("posts")}
+            onClick={() => { setActiveTab("posts"); setSelectedStatus("all"); }}
             className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
               activeTab === "posts" 
                 ? "bg-white text-indigo-600 shadow-md shadow-zinc-250/20" 
@@ -237,6 +270,74 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
             <FileText className="w-4 h-4" />
             Articles ({posts.length})
           </button>
+        </div>
+
+        {/* Search & Filtering Bar */}
+        <div className="bg-white p-4 rounded-3xl border border-zinc-200/90 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="relative w-full md:max-w-md">
+            <input
+              type="text"
+              placeholder={`Search ${activeTab}...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all text-sm text-zinc-900 font-medium placeholder:text-zinc-400"
+            />
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-400">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3 w-full md:w-auto">
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="flex-1 md:flex-initial px-4 py-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-xs font-bold text-zinc-700 cursor-pointer"
+            >
+              <option value="all">All Categories</option>
+              {uniqueCategories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat.replace("-", " ").toUpperCase()}
+                </option>
+              ))}
+            </select>
+
+            {/* Status Filter */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="flex-1 md:flex-initial px-4 py-3 rounded-2xl border border-zinc-200 bg-zinc-50/50 focus:bg-white focus:border-indigo-500 outline-none transition-all text-xs font-bold text-zinc-700 cursor-pointer"
+            >
+              <option value="all">All Statuses</option>
+              {activeTab === "jobs" ? (
+                <>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </>
+              ) : (
+                <>
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </>
+              )}
+            </select>
+
+            {/* Clear Filters Button */}
+            {(searchQuery || selectedCategory !== "all" || selectedStatus !== "all") && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                  setSelectedStatus("all");
+                }}
+                className="px-4 py-3 rounded-2xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 transition-all border border-rose-100 cursor-pointer"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Data Grid Table */}
@@ -252,7 +353,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 font-medium">
-                {activeTab === "jobs" && jobs.map((job) => (
+                {activeTab === "jobs" && filteredJobs.map((job) => (
                   <tr key={job._id} className="hover:bg-zinc-50/30 transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
@@ -295,7 +396,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                   </tr>
                 ))}
                 
-                {activeTab === "posts" && posts.map((post) => (
+                {activeTab === "posts" && filteredPosts.map((post) => (
                   <tr key={post._id} className="hover:bg-zinc-50/30 transition-colors group">
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
@@ -338,11 +439,11 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                   </tr>
                 ))}
                 
-                {(activeTab === "jobs" && jobs.length === 0) || (activeTab === "posts" && posts.length === 0) ? (
+                {(activeTab === "jobs" && filteredJobs.length === 0) || (activeTab === "posts" && filteredPosts.length === 0) ? (
                   <tr>
                     <td colSpan={4} className="px-8 py-16 text-center text-sm font-semibold text-zinc-400">
                       <Briefcase className="w-8 h-8 text-zinc-300 mx-auto mb-3 opacity-60" />
-                      No {activeTab} records found on system.
+                      No matching {activeTab} found. Try adjusting your search/filters.
                     </td>
                   </tr>
                 ) : null}
