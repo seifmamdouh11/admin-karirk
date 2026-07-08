@@ -9,15 +9,8 @@ export default function ImportJobsPage() {
   const [activeTab, setActiveTab] = useState<"single" | "bulk">("single");
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-zinc-50/30 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Background Decorative Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e4e4e7_1px,transparent_1px),linear-gradient(to_bottom,#e4e4e7_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-[0.35] pointer-events-none -z-10" />
-      
-      {/* Glowing Blur Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[450px] h-[450px] rounded-full bg-indigo-200/25 blur-[100px] pointer-events-none -z-10" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[550px] h-[550px] rounded-full bg-violet-200/25 blur-[120px] pointer-events-none -z-10" />
-      
-      <div className="max-w-6xl mx-auto space-y-8 relative">
+    <div className="min-h-screen bg-white py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Breadcrumbs */}
         <nav className="flex items-center text-xs font-semibold text-zinc-400 space-x-2.5 uppercase tracking-wider">
