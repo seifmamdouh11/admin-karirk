@@ -86,23 +86,69 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
   };
 
   const getCategoryBadge = (slug: string = "") => {
-    const presets: Record<string, string> = {
-      "technology": "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30",
-      "software": "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30",
-      "marketing": "bg-pink-50 text-pink-700 border-pink-100 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900/30",
-      "design": "bg-pink-50 text-pink-700 border-pink-100 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900/30",
-      "sales": "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30",
-      "business": "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30",
-      "hr": "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30",
-      "recruitment": "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30"
+    const presets: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+      "technology": {
+        bg: "bg-indigo-50/65",
+        text: "text-indigo-600",
+        border: "border-indigo-100/80",
+        dot: "bg-indigo-500"
+      },
+      "software": {
+        bg: "bg-indigo-50/65",
+        text: "text-indigo-600",
+        border: "border-indigo-100/80",
+        dot: "bg-indigo-500"
+      },
+      "marketing": {
+        bg: "bg-pink-50/65",
+        text: "text-pink-600",
+        border: "border-pink-100/80",
+        dot: "bg-pink-500"
+      },
+      "design": {
+        bg: "bg-pink-50/65",
+        text: "text-pink-600",
+        border: "border-pink-100/80",
+        dot: "bg-pink-500"
+      },
+      "sales": {
+        bg: "bg-amber-50/65",
+        text: "text-amber-600",
+        border: "border-amber-100/80",
+        dot: "bg-amber-500"
+      },
+      "business": {
+        bg: "bg-amber-50/65",
+        text: "text-amber-600",
+        border: "border-amber-100/80",
+        dot: "bg-amber-500"
+      },
+      "hr": {
+        bg: "bg-purple-50/65",
+        text: "text-purple-600",
+        border: "border-purple-100/80",
+        dot: "bg-purple-500"
+      },
+      "recruitment": {
+        bg: "bg-purple-50/65",
+        text: "text-purple-600",
+        border: "border-purple-100/80",
+        dot: "bg-purple-500"
+      }
     };
 
     const cleanSlug = slug.toLowerCase();
     const matchedKey = Object.keys(presets).find(key => cleanSlug.includes(key));
-    const badgeStyle = matchedKey ? presets[matchedKey] : "bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-300 dark:border-zinc-700";
+    const theme = matchedKey ? presets[matchedKey] : {
+      bg: "bg-zinc-50/70",
+      text: "text-zinc-600",
+      border: "border-zinc-200/80",
+      dot: "bg-zinc-400"
+    };
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border ${badgeStyle} capitalize`}>
+      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${theme.bg} ${theme.text} ${theme.border}`}>
+        <span className={`h-1.5 w-1.5 rounded-full ${theme.dot}`} />
         {slug.replace("-", " ")}
       </span>
     );
@@ -354,7 +400,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
               </thead>
               <tbody className="divide-y divide-zinc-100 font-medium">
                 {activeTab === "jobs" && filteredJobs.map((job) => (
-                  <tr key={job._id} className="hover:bg-zinc-50/30 transition-colors group">
+                  <tr key={job._id} className="hover:bg-zinc-50/50 transition-colors group cursor-pointer">
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
                         <span className="text-sm font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">{job.title}</span>
@@ -397,7 +443,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                 ))}
                 
                 {activeTab === "posts" && filteredPosts.map((post) => (
-                  <tr key={post._id} className="hover:bg-zinc-50/30 transition-colors group">
+                  <tr key={post._id} className="hover:bg-zinc-50/50 transition-colors group cursor-pointer">
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
                         <span className="text-sm font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">{post.title}</span>
