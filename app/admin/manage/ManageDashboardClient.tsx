@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { 
   Key, Trash2, Edit, LayoutDashboard, Briefcase, FileText, 
-  AlertCircle, Database, Activity, Plus, FileSpreadsheet, Lock, Unlock, ArrowUpRight 
+  AlertCircle, Database, Activity, Plus, FileSpreadsheet, Lock, Unlock, ArrowUpRight, ArrowUp
 } from "lucide-react";
 
 export default function ManageDashboardClient({ initialJobs, initialPosts }: { initialJobs: any[], initialPosts: any[] }) {
@@ -15,6 +15,25 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
   const [secret, setSecret] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+  // Scroll to top state & listener
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollTop(true);
+      } else {
+        setShowScrollTop(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   // Search & Filtering States
   const [searchQuery, setSearchQuery] = useState("");
@@ -498,6 +517,19 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
           </div>
         </div>
       </div>
+
+      {/* Floating Scroll to Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-6 right-6 p-3.5 rounded-full bg-white text-zinc-700 hover:text-indigo-600 border border-zinc-200 shadow-xl transition-all duration-300 transform cursor-pointer z-50 hover:scale-110 active:scale-95 ${
+          showScrollTop 
+            ? "opacity-100 translate-y-0 scale-100" 
+            : "opacity-0 translate-y-4 scale-75 pointer-events-none"
+        }`}
+        aria-label="Scroll to top"
+      >
+        <ArrowUp className="w-5 h-5 stroke-[2.5]" />
+      </button>
     </div>
   );
 }
