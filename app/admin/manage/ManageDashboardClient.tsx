@@ -54,14 +54,14 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
 
   const getCategoryBadge = (slug: string = "") => {
     const presets: Record<string, string> = {
-      "technology": "bg-indigo-50 text-indigo-700 border-indigo-150 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30",
-      "software": "bg-indigo-50 text-indigo-700 border-indigo-150 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30",
-      "marketing": "bg-pink-50 text-pink-700 border-pink-150 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900/30",
-      "design": "bg-pink-50 text-pink-700 border-pink-150 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900/30",
-      "sales": "bg-amber-50 text-amber-700 border-amber-150 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30",
-      "business": "bg-amber-50 text-amber-700 border-amber-150 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30",
-      "hr": "bg-purple-50 text-purple-700 border-purple-150 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30",
-      "recruitment": "bg-purple-50 text-purple-700 border-purple-150 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30"
+      "technology": "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30",
+      "software": "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30",
+      "marketing": "bg-pink-50 text-pink-700 border-pink-100 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900/30",
+      "design": "bg-pink-50 text-pink-700 border-pink-100 dark:bg-pink-950/30 dark:text-pink-400 dark:border-pink-900/30",
+      "sales": "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30",
+      "business": "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30",
+      "hr": "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30",
+      "recruitment": "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30"
     };
 
     const cleanSlug = slug.toLowerCase();
@@ -96,14 +96,14 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <Link 
                 href="/admin/import" 
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all border border-indigo-100/50"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-all border border-indigo-100/50 cursor-pointer"
               >
                 <FileSpreadsheet className="w-4 h-4" />
                 Import Jobs
               </Link>
               <Link 
                 href="/admin/posts/new" 
-                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-lg hover:shadow-indigo-600/20"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all shadow-md shadow-indigo-600/10 hover:shadow-lg hover:shadow-indigo-600/20 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 Write Post
@@ -214,10 +214,10 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
         </div>
 
         {/* Tab Controls */}
-        <div className="flex bg-zinc-150/60 p-1.5 rounded-2xl self-start inline-flex border border-zinc-200/50">
+        <div className="flex bg-zinc-100/60 p-1.5 rounded-2xl self-start inline-flex border border-zinc-200/50">
           <button
             onClick={() => setActiveTab("jobs")}
-            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 ${
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
               activeTab === "jobs" 
                 ? "bg-white text-indigo-600 shadow-md shadow-zinc-250/20" 
                 : "text-zinc-500 hover:text-zinc-700 hover:bg-white/40"
@@ -228,7 +228,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
           </button>
           <button
             onClick={() => setActiveTab("posts")}
-            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 ${
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
               activeTab === "posts" 
                 ? "bg-white text-indigo-600 shadow-md shadow-zinc-250/20" 
                 : "text-zinc-500 hover:text-zinc-700 hover:bg-white/40"
@@ -279,14 +279,14 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                       <div className="flex justify-end gap-2.5">
                         <Link
                           href={`/admin/jobs/${job._id}/edit`}
-                          className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-150"
+                          className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-200 cursor-pointer"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(job._id, "jobs")}
                           disabled={isDeleting === job._id}
-                          className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl transition-all border border-transparent hover:border-rose-150 disabled:opacity-50"
+                          className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl transition-all border border-transparent hover:border-rose-200 disabled:opacity-50 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -322,14 +322,14 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                       <div className="flex justify-end gap-2.5">
                         <Link
                           href={`/admin/posts/${post._id}/edit`}
-                          className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-150"
+                          className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-200 cursor-pointer"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
                           onClick={() => handleDelete(post._id, "posts")}
                           disabled={isDeleting === post._id}
-                          className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl transition-all border border-transparent hover:border-rose-150 disabled:opacity-50"
+                          className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl transition-all border border-transparent hover:border-rose-200 disabled:opacity-50 cursor-pointer"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

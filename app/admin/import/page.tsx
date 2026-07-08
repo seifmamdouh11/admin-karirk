@@ -34,10 +34,10 @@ export default function ImportJobsPage() {
             </div>
           </div>
           
-          <div className="flex bg-zinc-150/60 p-1.5 rounded-2xl border border-zinc-200/50">
+          <div className="flex bg-zinc-100/60 p-1.5 rounded-2xl border border-zinc-200/50">
             <button
               onClick={() => setActiveTab("single")}
-              className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 ${
+              className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
                 activeTab === "single" 
                   ? "bg-white text-indigo-600 shadow-md shadow-zinc-250/20" 
                   : "text-zinc-500 hover:text-zinc-700 hover:bg-white/40"
@@ -48,7 +48,7 @@ export default function ImportJobsPage() {
             </button>
             <button
               onClick={() => setActiveTab("bulk")}
-              className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 ${
+              className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-xs font-bold transition-all duration-300 cursor-pointer ${
                 activeTab === "bulk" 
                   ? "bg-white text-indigo-600 shadow-md shadow-zinc-250/20" 
                   : "text-zinc-500 hover:text-zinc-700 hover:bg-white/40"
