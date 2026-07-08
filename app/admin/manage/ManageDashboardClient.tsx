@@ -16,6 +16,16 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
+  // 2-step Delete Confirmation State
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmTimeout, setConfirmTimeout] = useState<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimeout) clearTimeout(confirmTimeout);
+    };
+  }, [confirmTimeout]);
+
   // Scroll to top state & listener
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -68,17 +78,33 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  const handleDelete = async (id: string, type: "jobs" | "posts") => {
+  const handleDeleteClick = (id: string, type: "jobs" | "posts") => {
     if (!secret) {
       setError("Please enter your Admin Secret Key first.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    if (!confirm(`Are you sure you want to delete this ${type === "jobs" ? "job" : "post"}?`)) {
-      return;
+    if (confirmDeleteId === id) {
+      handleDelete(id, type);
+      setConfirmDeleteId(null);
+      if (confirmTimeout) {
+        clearTimeout(confirmTimeout);
+        setConfirmTimeout(null);
+      }
+    } else {
+      setConfirmDeleteId(id);
+      if (confirmTimeout) {
+        clearTimeout(confirmTimeout);
+      }
+      const timeout = setTimeout(() => {
+        setConfirmDeleteId(null);
+      }, 4000);
+      setConfirmTimeout(timeout);
     }
+  };
 
+  const handleDelete = async (id: string, type: "jobs" | "posts") => {
     setIsDeleting(id);
     setError(null);
 
@@ -450,11 +476,21 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
-                          onClick={() => handleDelete(job._id, "jobs")}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(job._id, "jobs");
+                          }}
                           disabled={isDeleting === job._id}
-                          className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl transition-all border border-transparent hover:border-rose-200 disabled:opacity-50 cursor-pointer"
+                          className={`p-2 rounded-xl transition-all border flex items-center gap-1 cursor-pointer disabled:opacity-50 ${
+                            confirmDeleteId === job._id
+                              ? "text-white bg-rose-600 border-rose-600 hover:bg-rose-700 hover:border-rose-700"
+                              : "text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 border-transparent hover:border-rose-200"
+                          }`}
                         >
                           <Trash2 className="w-4 h-4" />
+                          {confirmDeleteId === job._id && (
+                            <span className="text-[10px] font-black uppercase tracking-wider px-1">Confirm?</span>
+                          )}
                         </button>
                       </div>
                     </td>
@@ -493,11 +529,21 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
-                          onClick={() => handleDelete(post._id, "posts")}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteClick(post._id, "posts");
+                          }}
                           disabled={isDeleting === post._id}
-                          className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 rounded-xl transition-all border border-transparent hover:border-rose-200 disabled:opacity-50 cursor-pointer"
+                          className={`p-2 rounded-xl transition-all border flex items-center gap-1 cursor-pointer disabled:opacity-50 ${
+                            confirmDeleteId === post._id
+                              ? "text-white bg-rose-600 border-rose-600 hover:bg-rose-700 hover:border-rose-700"
+                              : "text-zinc-400 hover:text-rose-600 hover:bg-rose-50/80 border-transparent hover:border-rose-200"
+                          }`}
                         >
                           <Trash2 className="w-4 h-4" />
+                          {confirmDeleteId === post._id && (
+                            <span className="text-[10px] font-black uppercase tracking-wider px-1">Confirm?</span>
+                          )}
                         </button>
                       </div>
                     </td>
