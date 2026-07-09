@@ -46,6 +46,11 @@ function parseJSON(text: string): JobRow[] {
   return Array.isArray(data) ? data : data.jobs ?? [];
 }
 
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  try { return String(error); } catch { return "Unknown error"; }
+}
+
 const CSV_TEMPLATE = `title,description,salary,type,company,category,country,applyLink,location,status
 "Senior Developer","Build amazing products","$5000/mo","full-time","Acme Corp","engineering","Egypt","https://apply.example.com","Cairo","active"
 `;

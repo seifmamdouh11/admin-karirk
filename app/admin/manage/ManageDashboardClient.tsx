@@ -15,6 +15,7 @@ type AdminJob = {
   company?: string;
   category?: string;
   status?: string;
+  slug?: string;
 };
 
 type AdminPost = {
@@ -22,6 +23,7 @@ type AdminPost = {
   title: string;
   category?: string;
   status?: string;
+  slug?: string;
 };
 
 export default function ManageDashboardClient({ initialJobs, initialPosts }: { initialJobs: AdminJob[]; initialPosts: AdminPost[] }) {
@@ -67,12 +69,12 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
 
-  const uniqueCategories = Array.from(
-    new Set([
-      ...jobs.map((j) => j.category),
-      ...posts.map((p) => p.category),
-    ].filter(Boolean))
-  );
+  const cats = ([
+    ...jobs.map((j) => j.category),
+    ...posts.map((p) => p.category),
+  ] as (string | undefined)[]).filter((c): c is string => !!c && c.length > 0);
+
+  const uniqueCategories = Array.from(new Set(cats));
 
   const filteredJobs = jobs.filter((job) => {
     const matchesSearch = 
