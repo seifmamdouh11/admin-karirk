@@ -22,15 +22,23 @@ function validateRow(row: Partial<JobRow>): string[] {
   return errs;
 }
 
+import Papa from "papaparse";
+
 function parseCSV(text: string): JobRow[] {
-  const lines = text.trim().split(/\r?\n/);
-  const headers = lines[0].split(",").map(h => h.trim().replace(/^"|"$/g, ""));
-  return lines.slice(1).filter(l => l.trim()).map(line => {
-    const vals = line.match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$|^(?=,))/g) || [];
-    const obj: Record<string, string> = {};
-    headers.forEach((h, i) => { obj[h] = (vals[i] || "").trim().replace(/^"|"$/g, ""); });
-    return obj as JobRow;
+  const parsed = Papa.parse<Record<string, string>>(text, {
+    header: true,
+    skipEmptyLines: true,
+    transformHeader: (h) => h?.trim().replace(/^"|"$/g, "") || "",
+    transform: (v) => (typeof v === "string" ? v.trim().replace(/^"|"$/g, "") : v),
   });
+
+  if (parsed.errors && parsed.errors.length > 0) {
+    // Throw the first error for the UI to show
+    throw new Error(parsed.errors.map(e => e.message || "CSV parse error").join("; "));
+  }
+
+  // Ensure we return plain JobRow array
+  return (parsed.data || []) as unknown as JobRow[];
 }
 
 function parseJSON(text: string): JobRow[] {
@@ -74,7 +82,7 @@ export default function BulkImportTool() {
       if (!raw.length) { setParseError("No rows found in file."); return; }
       setRows(raw.map((d, i) => ({ index: i, data: d, errors: validateRow(d), included: true })));
       setStep(2);
-    } catch (e: any) { setParseError(`Parse error: ${e.message}`); }
+    } catch (e: unknown) { setParseError(`Parse error: ${getErrorMessage(e)}`); }
   }, []);
 
   const handleFile = (file: File) => {
@@ -108,7 +116,7 @@ export default function BulkImportTool() {
       if (!res.ok) { showToast(data.error ?? "Request failed.", "error"); setLoading(false); return; }
       setResult(data);
       setStep(3);
-    } catch (e: any) { showToast(e.message, "error"); }
+    } catch (e: unknown) { showToast(getErrorMessage(e), "error"); }
     finally { setLoading(false); }
   };
 
@@ -317,7 +325,7 @@ export default function BulkImportTool() {
 
             <div className="flex justify-center gap-4 mt-8">
               <button className="btn btn-primary" onClick={reset}>Import Another File</button>
-              <a href="/jobs" className="btn btn-ghost" target="_blank">View Jobs →</a>
+              <a href="/admin/manage" className="btn btn-ghost">← Back to Dashboard</a>
             </div>
           </div>
         )}

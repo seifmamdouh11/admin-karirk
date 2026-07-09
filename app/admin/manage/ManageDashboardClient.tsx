@@ -3,12 +3,29 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { 
-  Key, Trash2, Edit, LayoutDashboard, Briefcase, FileText, 
+  Trash2, Edit, LayoutDashboard, Briefcase, FileText, 
   AlertCircle, Database, Activity, Plus, FileSpreadsheet, Lock, Unlock, ArrowUpRight, ArrowUp
 } from "lucide-react";
 
-export default function ManageDashboardClient({ initialJobs, initialPosts }: { initialJobs: any[], initialPosts: any[] }) {
+type AdminJob = {
+  _id: string;
+  title: string;
+  company?: string;
+  category?: string;
+  status?: string;
+};
+
+type AdminPost = {
+  _id: string;
+  title: string;
+  category?: string;
+  status?: string;
+};
+
+export default function ManageDashboardClient({ initialJobs, initialPosts }: { initialJobs: AdminJob[]; initialPosts: AdminPost[] }) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"jobs" | "posts">("jobs");
   const [jobs, setJobs] = useState(initialJobs);
   const [posts, setPosts] = useState(initialPosts);
@@ -18,7 +35,7 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
 
   // 2-step Delete Confirmation State
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [confirmTimeout, setConfirmTimeout] = useState<any>(null);
+  const [confirmTimeout, setConfirmTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     return () => {
@@ -122,8 +139,9 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
           setPosts(posts.filter(p => p._id !== id));
         }
       }
-    } catch (err: any) {
-      setError(err.response?.data?.error || err.response?.data?.message || "Failed to delete. Check your secret key.");
+    } catch (err: unknown) {
+      const errorData = err as { response?: { data?: { error?: string; message?: string } } };
+      setError(errorData.response?.data?.error || errorData.response?.data?.message || "Failed to delete. Check your secret key.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setIsDeleting(null);
@@ -445,7 +463,11 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
               </thead>
               <tbody className="divide-y divide-zinc-100 font-medium">
                 {activeTab === "jobs" && filteredJobs.map((job) => (
-                  <tr key={job._id} className="hover:bg-zinc-50/50 transition-colors group cursor-pointer">
+                  <tr 
+                    key={job._id} 
+                    onClick={() => router.push(`/admin/jobs/${job._id}/edit`)}
+                    className="hover:bg-zinc-50/50 transition-colors group cursor-pointer"
+                  >
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
                         <span className="text-sm font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">{job.title}</span>
@@ -470,8 +492,18 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                     <td className="px-8 py-5 text-right">
                       <div className="flex justify-end gap-2.5">
                         <Link
-                          href={`/admin/jobs/${job._id}/edit`}
+                          href={`/jobs/${job.slug || job._id}`}
+                          onClick={(e) => e.stopPropagation()}
                           className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-200 cursor-pointer"
+                          title="Preview Job"
+                        >
+                          <ArrowUpRight className="w-4 h-4" />
+                        </Link>
+                        <Link
+                          href={`/admin/jobs/${job._id}/edit`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-200 cursor-pointer"
+                          title="Edit Job"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
@@ -498,7 +530,11 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                 ))}
                 
                 {activeTab === "posts" && filteredPosts.map((post) => (
-                  <tr key={post._id} className="hover:bg-zinc-50/50 transition-colors group cursor-pointer">
+                  <tr 
+                    key={post._id} 
+                    onClick={() => router.push(`/admin/posts/${post._id}/edit`)}
+                    className="hover:bg-zinc-50/50 transition-colors group cursor-pointer"
+                  >
                     <td className="px-8 py-5">
                       <div className="flex flex-col">
                         <span className="text-sm font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">{post.title}</span>
@@ -523,8 +559,18 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
                     <td className="px-8 py-5 text-right">
                       <div className="flex justify-end gap-2.5">
                         <Link
-                          href={`/admin/posts/${post._id}/edit`}
+                          href={`/posts/${post.slug || post._id}`}
+                          onClick={(e) => e.stopPropagation()}
                           className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-200 cursor-pointer"
+                          title="Preview Article"
+                        >
+                          <ArrowUpRight className="w-4 h-4" />
+                        </Link>
+                        <Link
+                          href={`/admin/posts/${post._id}/edit`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-2 text-zinc-400 hover:text-indigo-600 hover:bg-indigo-50/80 rounded-xl transition-all border border-transparent hover:border-indigo-200 cursor-pointer"
+                          title="Edit Article"
                         >
                           <Edit className="w-4 h-4" />
                         </Link>

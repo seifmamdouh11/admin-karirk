@@ -2,10 +2,22 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Briefcase, Send, AlertCircle, CheckCircle2, LayoutTemplate, Key, MapPin, Building2, Globe, DollarSign, Link as LinkIcon, FileText } from "lucide-react";
 import Link from "next/link";
 
+type CategoryItem = { _id: string; name: string; slug: string };
+type CategoryWithSubcategories = CategoryItem & { subcategories: CategoryItem[] };
+
+type ErrorLike = { response?: { data?: { error?: string; message?: string } } };
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
 export default function SingleJobForm() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -20,7 +32,7 @@ export default function SingleJobForm() {
     secret: "",
   });
 
-  const [categories, setCategories] = useState<{ _id: string; name: string; slug: string; subcategories: any[] }[]>([]);
+  const [categories, setCategories] = useState<CategoryWithSubcategories[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -35,7 +47,7 @@ export default function SingleJobForm() {
             setFormData(prev => ({ ...prev, category: res.data.data[0].slug }));
           }
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to fetch categories:", err);
       }
     };
@@ -75,7 +87,13 @@ export default function SingleJobForm() {
       );
 
       if (res.data && (res.data.job || res.status === 201)) {
-        setSuccess(true);
+        const slug = res.data.job?.slug;
+        if (slug) {
+          // Redirect to admin preview page
+          router.push(`/jobs/${slug}`);
+        } else {
+          setSuccess(true);
+        }
         // Reset form
         setFormData(prev => ({
           ...prev,
@@ -87,11 +105,13 @@ export default function SingleJobForm() {
         }));
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
+      const errorData = err as ErrorLike;
       setError(
-        err.response?.data?.error || 
-        err.response?.data?.message || 
+        errorData.response?.data?.error || 
+        errorData.response?.data?.message || 
+        getErrorMessage(err) ||
         "Failed to create job. Please check your secret key and try again."
       );
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -135,12 +155,11 @@ export default function SingleJobForm() {
           <div>
             <h3 className="font-semibold">Job Created Successfully!</h3>
             <p className="text-sm text-emerald-700 mt-1">Your job is now live on the platform.</p>
-            <Link 
-              href="/jobs"
-              target="_blank"
+            <Link
+              href="/admin/manage"
               className="inline-block mt-3 text-sm font-medium text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg hover:bg-emerald-200 transition-colors"
             >
-              View Jobs Board &rarr;
+              Back to Dashboard &rarr;
             </Link>
           </div>
         </div>

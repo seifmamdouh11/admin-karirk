@@ -2,10 +2,17 @@
 
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 import { PenSquare, Send, AlertCircle, CheckCircle2, LayoutTemplate, Briefcase, Key } from "lucide-react";
 import Link from "next/link";
 
+type CategoryItem = { _id: string; name: string; slug: string };
+type CategoryWithSubcategories = CategoryItem & { subcategories: CategoryItem[] };
+
+type ErrorLike = { response?: { data?: { error?: string; message?: string } } };
+
 export default function AddPostPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -14,11 +21,10 @@ export default function AddPostPage() {
     secret: "",
   });
 
-  const [categories, setCategories] = useState<{ _id: string; name: string; slug: string; subcategories: any[] }[]>([]);
+  const [categories, setCategories] = useState<CategoryWithSubcategories[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [createdPostSlug, setCreatedPostSlug] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -66,8 +72,13 @@ export default function AddPostPage() {
       );
 
       if (res.data && res.data.success) {
-        setSuccess(true);
-        setCreatedPostSlug(res.data.post.slug);
+        const slug = res.data.post?.slug;
+        if (slug) {
+          // Redirect to admin preview page
+          router.push(`/posts/${slug}`);
+        } else {
+          setSuccess(true);
+        }
         // Reset form except secret
         setFormData(prev => ({
           ...prev,
@@ -75,11 +86,12 @@ export default function AddPostPage() {
           description: "",
         }));
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
+      const errorData = err as ErrorLike;
       setError(
-        err.response?.data?.error || 
-        err.response?.data?.message || 
+        errorData.response?.data?.error || 
+        errorData.response?.data?.message || 
         "Failed to create post. Please check your secret key and try again."
       );
     } finally {
@@ -147,15 +159,12 @@ export default function AddPostPage() {
             <div>
               <h3 className="font-semibold">Article Published Successfully!</h3>
               <p className="text-sm text-emerald-700 mt-1">Your article is now live on the platform.</p>
-              {createdPostSlug && (
-                <Link 
-                  href={`/posts/${createdPostSlug}`}
-                  target="_blank"
-                  className="inline-block mt-3 text-sm font-medium text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg hover:bg-emerald-200 transition-colors"
-                >
-                  View Article &rarr;
-                </Link>
-              )}
+              <Link
+                href="/admin/manage"
+                className="inline-block mt-3 text-sm font-medium text-emerald-800 bg-emerald-100 px-3 py-1.5 rounded-lg hover:bg-emerald-200 transition-colors"
+              >
+                Back to Dashboard &rarr;
+              </Link>
             </div>
           </div>
         )}
