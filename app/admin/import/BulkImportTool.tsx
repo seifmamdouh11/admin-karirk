@@ -68,14 +68,14 @@ function mapRowKeys(row: Record<string, string>): JobRow {
   return {
     title: mapped.title || "",
     description: mapped.description || "",
-    salary: mapped.salary || "",
+    salary: mapped.salary || "Not specified",
     type: mapped.type || "",
-    company: mapped.company || "",
+    company: mapped.company || "Unknown Company",
     category: mapped.category || "",
     country: mapped.country || "",
     applyLink: mapped.applyLink || "",
     location: mapped.location || "",
-    status: mapped.status || "",
+    status: mapped.status || "active",
   };
 }
 
