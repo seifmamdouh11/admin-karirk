@@ -35,6 +35,15 @@ export default function ManageDashboardClient({ initialJobs, initialPosts }: { i
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
+  // Keep client state synchronized when the server props update
+  useEffect(() => {
+    setJobs(initialJobs);
+  }, [initialJobs]);
+
+  useEffect(() => {
+    setPosts(initialPosts);
+  }, [initialPosts]);
+
   // 2-step Delete Confirmation State
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [confirmTimeout, setConfirmTimeout] = useState<ReturnType<typeof setTimeout> | null>(null);
